@@ -4,7 +4,7 @@ from streamlit_extras.row import row
 from datetime import datetime
 import calendar
 
-from utils import get_league_df, bundesliga, laliga, pl, seriea, ligue1
+from utils import get_league_df, bundesliga, laliga, pl, seriea, ligue1, get_filtered_df
 from badges import bundesliga_badges, laliga_badges, pl_badges, seriea_badges, ligue1_badges
 
 if 'selected_league' not in st.session_state or 'selected_row' not in st.session_state:
@@ -74,10 +74,10 @@ def result_header():
                 home_row.image(home_team_badge, width=60)
         with col3:
             with st.container(border=True, height=90):
-                result_row = row([1, 2, 1], vertical_align="top", gap="small")
-                result_row.markdown(f"#### {selected_row_data['FTHG']}")
-                result_row.markdown("#### Full time result")
-                result_row.markdown(f"#### {selected_row_data['FTAG']}")
+                result_row = row([1.5, 5, 1], vertical_align="top", gap="small")
+                result_row.markdown(f"### {selected_row_data['FTHG']}")
+                result_row.markdown('''### Match result''', unsafe_allow_html=True)
+                result_row.markdown(f"### {selected_row_data['FTAG']}")
         with col4:
             with st.container(border=True, height=90):
                 away_row = row([1, 5], vertical_align="centered", gap="small")
@@ -107,5 +107,24 @@ def match_date():
             pass
 
 
+def tabs_section():
+    with st.container(border=False):
+        tabs = ['Match Stats', 'Odds vs Prediction', 'Past H2H Results']
+        match_stats_tab, odds_pred_tab, past_h2h_tab = st.tabs(tabs)
+
+        with match_stats_tab:
+            st.subheader("Match Stats", divider='gray')
+
+        with odds_pred_tab:
+            st.subheader("Odds vs Prediction", divider='gray')
+
+        with past_h2h_tab:
+            st.subheader("Past H2H Results", divider='gray')
+            past_h2h_df = get_filtered_df(league=st.session_state.selected_league, season=None,
+                                          home_team=selected_row_data["HomeTeam"], away_team=selected_row_data["AwayTeam"], h2h=True)
+            st.write("Retrieved results: ", past_h2h_df.shape[0])
+            st.dataframe(past_h2h_df, selection_mode='single-row', hide_index=False)
+
 match_date()
 result_header()
+tabs_section()
