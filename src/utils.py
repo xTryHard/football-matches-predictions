@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
+
 def get_dataframes():
     df_bundesliga = pd.read_csv('src\data\dataset_bundesliga.csv', encoding='utf-8')
     df_laliga = pd.read_csv('src\data\dataset_laliga.csv', encoding='utf-8')
@@ -49,11 +50,14 @@ def get_seasons(league):
     return seasons
 
 
-def get_filtered_df(league, season, home_team, away_team, h2h=False):
+def get_filtered_df(league, season, home_team, away_team, h2h=False, is_season_num=False):
     df = get_league_df(league)
 
     if season:
-        num_season = get_seasons(league).index(season) + 1
+        if not is_season_num:
+            num_season = get_seasons(league).index(season) + 1
+        else:
+            num_season = season
     else:
         num_season = None
 
@@ -63,7 +67,8 @@ def get_filtered_df(league, season, home_team, away_team, h2h=False):
         mask &= (df['Season'] == num_season)
 
     if h2h:
-        mask &= ((df['HomeTeam'] == home_team) & (df['AwayTeam'] == away_team) | ((df['HomeTeam'] == away_team) & (df['AwayTeam'] == home_team)))
+        mask &= ((df['HomeTeam'] == home_team) & (df['AwayTeam'] == away_team) | (
+                (df['HomeTeam'] == away_team) & (df['AwayTeam'] == home_team)))
     else:
         if home_team is not None:
             mask &= (df['HomeTeam'] == home_team)
@@ -72,6 +77,7 @@ def get_filtered_df(league, season, home_team, away_team, h2h=False):
             mask &= (df['AwayTeam'] == away_team)
 
     return df[mask]
+
 
 def toggle_h2h_button():
     st.session_state.h2h_button_disabled = not st.session_state.h2h_button_disabled
@@ -92,6 +98,7 @@ def show_dataframe(league, season, home_team, away_team, h2h=False):
         st.session_state.selected_row = results.iloc[event.selection.rows[0]]
     else:
         st.session_state.selected_row = None
+
 
 bundesliga = 'Bundesliga'
 laliga = 'La Liga EA Sports'

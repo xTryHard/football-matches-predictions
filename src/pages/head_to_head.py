@@ -1,9 +1,11 @@
 import streamlit as st
 from menu import menu
 from streamlit_extras.row import row
+from streamlit_extras.grid import grid
+from streamlit_extras.chart_container import chart_container
 from datetime import datetime
 import calendar
-
+import pandas as pd
 from utils import get_league_df, bundesliga, laliga, pl, seriea, ligue1, get_filtered_df
 from badges import bundesliga_badges, laliga_badges, pl_badges, seriea_badges, ligue1_badges
 
@@ -13,12 +15,14 @@ if 'selected_league' not in st.session_state or 'selected_row' not in st.session
 st.session_state.h2h_button_disabled = True
 menu()
 
-df = get_league_df(st.session_state.selected_league)
 selected_row_data = st.session_state.selected_row
 
 st.title('Match and Past H2H encounters')
 st.write("See details of the current and past matches between the selected teams")
 st.divider()
+match_df = get_filtered_df(league=st.session_state.selected_league, season=selected_row_data['Season'],
+                           home_team=selected_row_data["HomeTeam"], away_team=selected_row_data["AwayTeam"],
+                           is_season_num=True)
 
 
 def get_badge(league, team):
@@ -107,13 +111,135 @@ def match_date():
             pass
 
 
+def match_summary():
+    st.markdown("##### Match Summary")
+
+    match_result_row = row(1, vertical_align="centered", gap="small")
+    match_result_row.table(match_df[
+                               ["Date", "HomeTeam", "AwayTeam", "FTHG", "FTAG", "HTHG", "HTAG", 'HS', 'AS', 'HF', 'AF',
+                                'HC', 'AC', 'HY', 'AY', 'HR', 'AR']])
+
+
+def get_scored_goals_match_df(grid):
+    goals_data = pd.concat([
+        match_df[['HomeTeam', 'FTHG', 'HTHG']].rename(columns={
+            'HomeTeam': 'Team', 'FTHG': 'Full Time Goals', 'HTHG': 'Half Time Goals'
+        }),
+        match_df[['AwayTeam', 'FTAG', 'HTAG']].rename(columns={
+            'AwayTeam': 'Team', 'FTAG': 'Full Time Goals', 'HTAG': 'Half Time Goals'
+        })
+    ], ignore_index=True)
+    grid.bar_chart(goals_data, x="Team", y=["Full Time Goals", "Half Time Goals"], color=["#e63946", "#0077b6"])
+
+
+def get_shots_match_df(grid):
+    shots_data = pd.concat([
+        match_df[['HomeTeam', 'HS']].rename(columns={
+            'HomeTeam': 'Team', 'HS': 'Shots'
+        }),
+        match_df[['AwayTeam', 'AS']].rename(columns={
+            'AwayTeam': 'Team', 'AS': 'Shots'
+        })
+    ], ignore_index=True)
+    grid.bar_chart(shots_data, x="Team", y='Shots', color=["#0077b6"])
+
+
+def get_corners_match_df(grid):
+    corners_data = pd.concat([
+        match_df[['HomeTeam', 'HC']].rename(columns={
+            'HomeTeam': 'Team', 'HC': 'Corners'
+        }),
+        match_df[['AwayTeam', 'AC']].rename(columns={
+            'AwayTeam': 'Team', 'AC': 'Corners'
+        })
+    ], ignore_index=True)
+    grid.bar_chart(corners_data, x="Team", y='Corners', color=["#e63946"])
+
+
+def get_fouls_match_df(grid):
+    fouls_data = pd.concat([
+        match_df[['HomeTeam', 'HF']].rename(columns={
+            'HomeTeam': 'Team', 'HF': 'Fouls Committed'
+        }),
+        match_df[['AwayTeam', 'AF']].rename(columns={
+            'AwayTeam': 'Team', 'AF': 'Fouls Committed'
+        })
+    ], ignore_index=True)
+    grid.bar_chart(fouls_data, x="Team", y='Fouls Committed', color=["#a8dadc"])
+
+
+def get_yellow_cards_match_df(grid):
+    yellow_cards_data = pd.concat([
+        match_df[['HomeTeam', 'HY']].rename(columns={
+            'HomeTeam': 'Team', 'HY': 'Yellow Cards'
+        }),
+        match_df[['AwayTeam', 'AY']].rename(columns={
+            'AwayTeam': 'Team', 'AY': 'Yellow Cards'
+        })
+    ], ignore_index=True)
+    grid.bar_chart(yellow_cards_data, x="Team", y='Yellow Cards', color=["#e9c46a"])
+
+
+def get_red_cards_match_df(grid):
+    red_cards_data = pd.concat([
+        match_df[['HomeTeam', 'HR']].rename(columns={
+            'HomeTeam': 'Team', 'HR': 'Red Cards'
+        }),
+        match_df[['AwayTeam', 'AR']].rename(columns={
+            'AwayTeam': 'Team', 'AR': 'Red Cards'
+        })
+    ], ignore_index=True)
+    grid.bar_chart(red_cards_data, x="Team", y='Red Cards', color=["#e63946"])
+
+
+def graphs():
+    st.markdown("##### Match Visualizations")
+    my_grid = grid([1, 0.1, 1, 0.1, 1], [1, 0.1, 1, 0.1, 1], [1, 0.1, 1, 0.1, 1], [1, 0.1, 1, 0.1, 1],
+                   vertical_align="top")
+
+    # Row 1
+    my_grid.text("Full Time and Half Time Goals by Team")
+    my_grid.empty()
+    my_grid.text("Shots by Team")
+    my_grid.empty()
+    my_grid.text("Corners by Team")
+
+    get_scored_goals_match_df(my_grid)
+    my_grid.empty()
+
+    get_shots_match_df(my_grid)
+    my_grid.empty()
+
+    get_corners_match_df(my_grid)
+
+    # Row 2
+    my_grid.text("Fouls Committed by Team")
+    my_grid.empty()
+    my_grid.text("Yellow Cards by Team")
+    my_grid.empty()
+    my_grid.text("Red Cards by Team")
+
+    get_fouls_match_df(my_grid)
+    my_grid.empty()
+
+    get_yellow_cards_match_df(my_grid)
+    my_grid.empty()
+
+    get_red_cards_match_df(my_grid)
+
+
 def tabs_section():
     with st.container(border=False):
-        tabs = ['Match Stats', 'Odds vs Prediction', 'Past H2H Results']
-        match_stats_tab, odds_pred_tab, past_h2h_tab = st.tabs(tabs)
+        tabs = ['Match Stats', 'H2H Stats', 'Odds vs Prediction', 'Past H2H Results']
+        match_stats_tab, h2h_stats_tabs, odds_pred_tab, past_h2h_tab = st.tabs(tabs)
 
         with match_stats_tab:
             st.subheader("Match Stats", divider='gray')
+            match_summary()
+            graphs()
+
+        with h2h_stats_tabs:
+            st.subheader("H2H Stats", divider='gray')
 
         with odds_pred_tab:
             st.subheader("Odds vs Prediction", divider='gray')
@@ -121,9 +247,11 @@ def tabs_section():
         with past_h2h_tab:
             st.subheader("Past H2H Results", divider='gray')
             past_h2h_df = get_filtered_df(league=st.session_state.selected_league, season=None,
-                                          home_team=selected_row_data["HomeTeam"], away_team=selected_row_data["AwayTeam"], h2h=True)
+                                          home_team=selected_row_data["HomeTeam"],
+                                          away_team=selected_row_data["AwayTeam"], h2h=True)
             st.write("Retrieved results: ", past_h2h_df.shape[0])
-            st.dataframe(past_h2h_df, selection_mode='single-row', hide_index=False)
+            st.dataframe(past_h2h_df, selection_mode='single-row', hide_index=True)
+
 
 match_date()
 result_header()
