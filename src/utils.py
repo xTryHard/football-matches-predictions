@@ -4,11 +4,11 @@ import streamlit as st
 
 
 def get_dataframes():
-    df_bundesliga = pd.read_csv('src\data\dataset_bundesliga.csv', encoding='utf-8')
-    df_laliga = pd.read_csv('src\data\dataset_laliga.csv', encoding='utf-8')
-    df_pl = pd.read_csv('src\data\dataset_premier.csv', encoding='windows-1252')
-    df_seriea = pd.read_csv('src\data\dataset_seriea.csv', encoding='utf-8')
-    df_ligue1 = pd.read_csv('src\data\dataset_ligue1.csv', encoding='utf-8')
+    df_bundesliga = pd.read_csv('src\data\dataset-bundesliga-combined.csv', encoding='utf-8')
+    df_laliga = pd.read_csv('src\data\dataset-laliga-combined.csv', encoding='utf-8')
+    df_pl = pd.read_csv('src\data\dataset-pl-combined.csv', encoding='windows-1252')
+    df_seriea = pd.read_csv('src\data\dataset-seriea-combined.csv', encoding='utf-8')
+    df_ligue1 = pd.read_csv('src\data\dataset-ligue1-combined.csv', encoding='utf-8')
 
     return df_bundesliga, df_laliga, df_pl, df_seriea, df_ligue1
 

@@ -2,7 +2,7 @@ import streamlit as st
 from menu import menu
 from streamlit_extras.row import row
 from streamlit_extras.grid import grid
-from streamlit_extras.chart_container import chart_container
+import plotly.express as px
 from datetime import datetime
 import calendar
 import pandas as pd
@@ -129,7 +129,9 @@ def get_scored_goals_match_df(grid):
             'AwayTeam': 'Team', 'FTAG': 'Full Time Goals', 'HTAG': 'Half Time Goals'
         })
     ], ignore_index=True)
-    grid.bar_chart(goals_data, x="Team", y=["Full Time Goals", "Half Time Goals"], color=["#e63946", "#0077b6"])
+    fig = px.bar(goals_data, x="Team", y=["Full Time Goals", "Half Time Goals"],
+                 title='Full Time & Half Time Goals by Team', barmode='group', labels={'value': 'Goals'})
+    grid.plotly_chart(fig)
 
 
 def get_shots_match_df(grid):
@@ -141,7 +143,8 @@ def get_shots_match_df(grid):
             'AwayTeam': 'Team', 'AS': 'Shots'
         })
     ], ignore_index=True)
-    grid.bar_chart(shots_data, x="Team", y='Shots', color=["#0077b6"])
+    fig = px.bar(shots_data, x="Team", y="Shots", title='Shots by Team', color='Team')
+    grid.plotly_chart(fig)
 
 
 def get_corners_match_df(grid):
@@ -153,7 +156,8 @@ def get_corners_match_df(grid):
             'AwayTeam': 'Team', 'AC': 'Corners'
         })
     ], ignore_index=True)
-    grid.bar_chart(corners_data, x="Team", y='Corners', color=["#e63946"])
+    fig = px.bar(corners_data, x="Team", y="Corners", title='Corners by Team', color='Team')
+    grid.plotly_chart(fig)
 
 
 def get_fouls_match_df(grid):
@@ -165,7 +169,8 @@ def get_fouls_match_df(grid):
             'AwayTeam': 'Team', 'AF': 'Fouls Committed'
         })
     ], ignore_index=True)
-    grid.bar_chart(fouls_data, x="Team", y='Fouls Committed', color=["#a8dadc"])
+    fig = px.bar(fouls_data, x="Team", y="Fouls Committed", title='Fouls Committed by Team', color='Team')
+    grid.plotly_chart(fig)
 
 
 def get_yellow_cards_match_df(grid):
@@ -177,7 +182,8 @@ def get_yellow_cards_match_df(grid):
             'AwayTeam': 'Team', 'AY': 'Yellow Cards'
         })
     ], ignore_index=True)
-    grid.bar_chart(yellow_cards_data, x="Team", y='Yellow Cards', color=["#e9c46a"])
+    fig = px.bar(yellow_cards_data, x="Team", y="Yellow Cards", title='Yellow Cards by Team', color='Team')
+    grid.plotly_chart(fig)
 
 
 def get_red_cards_match_df(grid):
@@ -189,21 +195,80 @@ def get_red_cards_match_df(grid):
             'AwayTeam': 'Team', 'AR': 'Red Cards'
         })
     ], ignore_index=True)
-    grid.bar_chart(red_cards_data, x="Team", y='Red Cards', color=["#e63946"])
+    fig = px.bar(red_cards_data, x="Team", y="Red Cards", title='Red Cards by Team', color='Team')
+    grid.plotly_chart(fig)
+
+def get_elo_match_df(grid):
+    elo_data = pd.concat([
+        match_df[['HomeTeam', 'HomeElo']].rename(columns={
+            'HomeTeam': 'Team', 'HomeElo': 'Elo'
+        }),
+        match_df[['AwayTeam', 'AwayElo']].rename(columns={
+            'AwayTeam': 'Team', 'AR': 'Elo'
+        })
+    ], ignore_index=True)
+    fig = px.bar(elo_data, x="Team", y="Elo", title='Elo by Team', color='Team')
+    grid.plotly_chart(fig)
+
+def get_goals_current_season_match_df(grid):
+    goals_data = pd.concat([
+        match_df[['HomeTeam', 'HomeTeamGoalsCurrentSeason', 'HomeTeamGoalsConcededCurrentSeason']].rename(columns={
+            'HomeTeam': 'Team', 'HomeTeamGoalsCurrentSeason': 'Goals Scored', 'HomeTeamGoalsConcededCurrentSeason': 'Goals Conceded'
+        }),
+        match_df[['AwayTeam', 'AwayTeamGoalsCurrentSeason', 'AwayTeamGoalsConcededCurrentSeason']].rename(columns={
+            'AwayTeam': 'Team', 'AwayTeamGoalsCurrentSeason': 'Goals Scored', 'AwayTeamGoalsConcededCurrentSeason': 'Goals Conceded'
+        })
+    ], ignore_index=True)
+    fig = px.bar(goals_data, x="Team", y=["Goals Scored", "Goals Conceded"],
+                 title='Scored & Conceded Goals by Team (Current Season)', barmode='group', labels={'value': 'Goals'})
+    grid.plotly_chart(fig)
+
+def get_win_rate_current_season_match_df(grid):
+    win_rate_data = pd.concat([
+        match_df[['HomeTeam', 'HomeTeamWinRateSeason']].rename(columns={
+            'HomeTeam': 'Team', 'HomeTeamWinRateSeason': 'Win Rate'
+        }),
+        match_df[['AwayTeam', 'AwayTeamWinRateSeason']].rename(columns={
+            'AwayTeam': 'Team', 'AwayTeamWinRateSeason': 'Win Rate'
+        })
+    ], ignore_index=True)
+    fig = px.bar(win_rate_data, x="Team", y="Win Rate", title='Win Rate by Team (Current Season)', color='Team')
+    grid.plotly_chart(fig)
+
+def get_h2h_goals_match_df(grid):
+    goals_data = pd.concat([
+        match_df[['HomeTeam', 'HeadToHeadHomeGoals']].rename(columns={
+            'HomeTeam': 'Team', 'HeadToHeadHomeGoals': 'Goals Scored',
+        }),
+        match_df[['AwayTeam', 'HeadToHeadAwayGoals']].rename(columns={
+            'AwayTeam': 'Team', 'HeadToHeadAwayGoals': 'Goals Scored',
+        })
+    ], ignore_index=True)
+    fig = px.bar(goals_data, x="Team", y='Goals Scored',
+                 title='Goals Scored H2H', barmode='group')
+    grid.plotly_chart(fig)
 
 
-def graphs():
+def get_h2h_rates_match_df(grid):
+    matches = match_df["HeadToHeadMatches"].iloc[0]
+    win_rate_data = match_df[['HeadToHeadHomeWinRate', 'HeadToHeadAwayWinRate', 'HeadToHeadDrawRate']]
+    win_rate_data.rename(columns={
+        'HeadToHeadHomeWinRate': 'Home Win Rate',
+        'HeadToHeadAwayWinRate': 'Away Win Rate',
+        'HeadToHeadDrawRate': 'Draw Rate'
+    }, inplace=True)
+    df_melted = win_rate_data.melt(var_name='Result', value_name='Rate')
+    fig = px.pie(df_melted, names='Result', values='Rate', title=f'Head to Head Rates (on the {matches} previous matches)')
+    grid.plotly_chart(fig)
+
+
+
+
+def match_graphs():
     st.markdown("##### Match Visualizations")
-    my_grid = grid([1, 0.1, 1, 0.1, 1], [1, 0.1, 1, 0.1, 1], [1, 0.1, 1, 0.1, 1], [1, 0.1, 1, 0.1, 1],
-                   vertical_align="top")
+    my_grid = grid([1, 0.1, 1, 0.1, 1], [1, 0.1, 1, 0.1, 1], [1, 0.1, 1, 0.1, 1], vertical_align="top")
 
     # Row 1
-    my_grid.text("Full Time and Half Time Goals by Team")
-    my_grid.empty()
-    my_grid.text("Shots by Team")
-    my_grid.empty()
-    my_grid.text("Corners by Team")
-
     get_scored_goals_match_df(my_grid)
     my_grid.empty()
 
@@ -213,12 +278,6 @@ def graphs():
     get_corners_match_df(my_grid)
 
     # Row 2
-    my_grid.text("Fouls Committed by Team")
-    my_grid.empty()
-    my_grid.text("Yellow Cards by Team")
-    my_grid.empty()
-    my_grid.text("Red Cards by Team")
-
     get_fouls_match_df(my_grid)
     my_grid.empty()
 
@@ -227,6 +286,35 @@ def graphs():
 
     get_red_cards_match_df(my_grid)
 
+    # Row 3
+    get_elo_match_df(my_grid)
+    my_grid.empty()
+
+    get_goals_current_season_match_df(my_grid)
+    my_grid.empty()
+
+    get_win_rate_current_season_match_df(my_grid)
+
+def h2h_graphs():
+    st.markdown("##### H2H Visualizations")
+    my_grid = grid([1, 0.1, 1], [1, 0.1, 1, 0.1, 1], vertical_align="top")
+    # Row 1
+    get_h2h_rates_match_df(my_grid)
+    my_grid.empty()
+    get_h2h_goals_match_df(my_grid)
+    # get_shots_match_df(my_grid)
+    # my_grid.empty()
+    #
+    # get_corners_match_df(my_grid)
+    #
+    # # Row 2
+    # get_fouls_match_df(my_grid)
+    # my_grid.empty()
+    #
+    # get_yellow_cards_match_df(my_grid)
+    # my_grid.empty()
+    #
+    # get_red_cards_match_df(my_grid)
 
 def tabs_section():
     with st.container(border=False):
@@ -236,11 +324,11 @@ def tabs_section():
         with match_stats_tab:
             st.subheader("Match Stats", divider='gray')
             match_summary()
-            graphs()
+            match_graphs()
 
         with h2h_stats_tabs:
             st.subheader("H2H Stats", divider='gray')
-
+            h2h_graphs()
         with odds_pred_tab:
             st.subheader("Odds vs Prediction", divider='gray')
 
