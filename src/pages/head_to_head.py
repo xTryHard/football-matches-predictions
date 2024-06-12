@@ -1,3 +1,5 @@
+import joblib
+import numpy as np
 import streamlit as st
 from menu import menu
 from streamlit_extras.row import row
@@ -198,6 +200,7 @@ def get_red_cards_match_df(grid):
     fig = px.bar(red_cards_data, x="Team", y="Red Cards", title='Red Cards by Team', color='Team')
     grid.plotly_chart(fig)
 
+
 def get_elo_match_df(grid):
     elo_data = pd.concat([
         match_df[['HomeTeam', 'HomeElo']].rename(columns={
@@ -210,18 +213,22 @@ def get_elo_match_df(grid):
     fig = px.bar(elo_data, x="Team", y="Elo", title='Elo by Team', color='Team')
     grid.plotly_chart(fig)
 
+
 def get_goals_current_season_match_df(grid):
     goals_data = pd.concat([
         match_df[['HomeTeam', 'HomeTeamGoalsCurrentSeason', 'HomeTeamGoalsConcededCurrentSeason']].rename(columns={
-            'HomeTeam': 'Team', 'HomeTeamGoalsCurrentSeason': 'Goals Scored', 'HomeTeamGoalsConcededCurrentSeason': 'Goals Conceded'
+            'HomeTeam': 'Team', 'HomeTeamGoalsCurrentSeason': 'Goals Scored',
+            'HomeTeamGoalsConcededCurrentSeason': 'Goals Conceded'
         }),
         match_df[['AwayTeam', 'AwayTeamGoalsCurrentSeason', 'AwayTeamGoalsConcededCurrentSeason']].rename(columns={
-            'AwayTeam': 'Team', 'AwayTeamGoalsCurrentSeason': 'Goals Scored', 'AwayTeamGoalsConcededCurrentSeason': 'Goals Conceded'
+            'AwayTeam': 'Team', 'AwayTeamGoalsCurrentSeason': 'Goals Scored',
+            'AwayTeamGoalsConcededCurrentSeason': 'Goals Conceded'
         })
     ], ignore_index=True)
     fig = px.bar(goals_data, x="Team", y=["Goals Scored", "Goals Conceded"],
                  title='Scored & Conceded Goals by Team (Current Season)', barmode='group', labels={'value': 'Goals'})
     grid.plotly_chart(fig)
+
 
 def get_win_rate_current_season_match_df(grid):
     win_rate_data = pd.concat([
@@ -235,6 +242,7 @@ def get_win_rate_current_season_match_df(grid):
     fig = px.bar(win_rate_data, x="Team", y="Win Rate", title='Win Rate by Team (Current Season)', color='Team')
     grid.plotly_chart(fig)
 
+
 def get_h2h_goals_match_df(grid):
     goals_data = pd.concat([
         match_df[['HomeTeam', 'HeadToHeadHomeGoals']].rename(columns={
@@ -245,24 +253,239 @@ def get_h2h_goals_match_df(grid):
         })
     ], ignore_index=True)
     fig = px.bar(goals_data, x="Team", y='Goals Scored',
-                 title='Goals Scored H2H', barmode='group')
+                 title='Goals Scored H2H', barmode='group', color='Team')
     grid.plotly_chart(fig)
 
 
 def get_h2h_rates_match_df(grid):
+    home_team = match_df["HomeTeam"].iloc[0]
+    away_team = match_df["AwayTeam"].iloc[0]
     matches = match_df["HeadToHeadMatches"].iloc[0]
     win_rate_data = match_df[['HeadToHeadHomeWinRate', 'HeadToHeadAwayWinRate', 'HeadToHeadDrawRate']]
     win_rate_data.rename(columns={
-        'HeadToHeadHomeWinRate': 'Home Win Rate',
-        'HeadToHeadAwayWinRate': 'Away Win Rate',
+        'HeadToHeadHomeWinRate': f'{home_team} Win Rate',
+        'HeadToHeadAwayWinRate': f'{away_team} Win Rate',
         'HeadToHeadDrawRate': 'Draw Rate'
     }, inplace=True)
     df_melted = win_rate_data.melt(var_name='Result', value_name='Rate')
-    fig = px.pie(df_melted, names='Result', values='Rate', title=f'Head to Head Rates (on the {matches} previous matches)')
+    fig = px.pie(df_melted, names='Result', values='Rate',
+                 title=f'Head to Head Rates (on the {matches} previous matches)')
     grid.plotly_chart(fig)
 
 
+def get_models_bundesliga():
+    binary_in_game = joblib.load('src/models-and-scalers/bundesliga/best_model_bundesliga_binary_in_game.pkl')
+    binary_pre_game = joblib.load('src/models-and-scalers/bundesliga/best_model_bundesliga_binary_pre_game.pkl')
+    multiclass_in_game = joblib.load('src/models-and-scalers/bundesliga/best_model_bundesliga_multi_in_game.pkl')
+    multiclass_pre_game = joblib.load('src/models-and-scalers/bundesliga/best_model_bundesliga_multi_pre_game.pkl')
 
+    return binary_in_game, binary_pre_game, multiclass_in_game, multiclass_pre_game
+
+
+def get_models_laliga():
+    binary_in_game = joblib.load('src/models-and-scalers/laliga/best_model_laliga_binary_in_game.pkl')
+    binary_pre_game = joblib.load('src/models-and-scalers/laliga/best_model_laliga_binary_pre_game.pkl')
+    multiclass_in_game = joblib.load('src/models-and-scalers/laliga/best_model_laliga_multi_in_game.pkl')
+    multiclass_pre_game = joblib.load('src/models-and-scalers/laliga/best_model_laliga_multi_pre_game.pkl')
+
+    return binary_in_game, binary_pre_game, multiclass_in_game, multiclass_pre_game
+
+
+def get_models_ligue1():
+    binary_in_game = joblib.load('src/models-and-scalers/ligue1/best_model_ligue1_binary_in_game.pkl')
+    binary_pre_game = joblib.load('src/models-and-scalers/ligue1/best_model_ligue1_binary_pre_game.pkl')
+    multiclass_in_game = joblib.load('src/models-and-scalers/ligue1/best_model_ligue1_multi_in_game.pkl')
+    multiclass_pre_game = joblib.load('src/models-and-scalers/ligue1/best_model_ligue1_multi_pre_game.pkl')
+
+    return binary_in_game, binary_pre_game, multiclass_in_game, multiclass_pre_game
+
+
+def get_models_pl():
+    binary_in_game = joblib.load('src/models-and-scalers/pl/best_model_pl_binary_in_game.pkl')
+    binary_pre_game = joblib.load('src/models-and-scalers/pl/best_model_pl_binary_pre_game.pkl')
+    multiclass_in_game = joblib.load('src/models-and-scalers/pl/best_model_pl_multi_in_game.pkl')
+    multiclass_pre_game = joblib.load('src/models-and-scalers/pl/best_model_pl_multi_pre_game.pkl')
+
+    return binary_in_game, binary_pre_game, multiclass_in_game, multiclass_pre_game
+
+
+def get_models_seriea():
+    binary_in_game = joblib.load('src/models-and-scalers/seriea/best_model_seriea_binary_in_game.pkl')
+    binary_pre_game = joblib.load('src/models-and-scalers/seriea/best_model_seriea_binary_pre_game.pkl')
+    multiclass_in_game = joblib.load('src/models-and-scalers/seriea/best_model_seriea_multi_in_game.pkl')
+    multiclass_pre_game = joblib.load('src/models-and-scalers/seriea/best_model_seriea_multi_pre_game.pkl')
+
+    return binary_in_game, binary_pre_game, multiclass_in_game, multiclass_pre_game
+
+
+def get_scalers_bundesliga():
+    in_game = joblib.load('src/models-and-scalers/bundesliga/scaler_bundesliga_multi_in_game.pkl')
+    pre_game = joblib.load('src/models-and-scalers/bundesliga/scaler_bundesliga_multi_pre_game.pkl')
+
+    return in_game, pre_game
+
+
+def get_scalers_laliga():
+    in_game = joblib.load('src/models-and-scalers/laliga/scaler_laliga_multi_in_game.pkl')
+    pre_game = joblib.load('src/models-and-scalers/laliga/scaler_laliga_multi_pre_game.pkl')
+
+    return in_game, pre_game
+
+
+def get_scalers_ligue1():
+    in_game = joblib.load('src/models-and-scalers/ligue1/scaler_ligue1_multi_in_game.pkl')
+    pre_game = joblib.load('src/models-and-scalers/ligue1/scaler_ligue1_multi_pre_game.pkl')
+
+    return in_game, pre_game
+
+
+def get_scalers_pl():
+    in_game = joblib.load('src/models-and-scalers/pl/scaler_pl_multi_in_game.pkl')
+    pre_game = joblib.load('src/models-and-scalers/pl/scaler_pl_multi_pre_game.pkl')
+
+    return in_game, pre_game
+
+
+def get_scalers_seriea():
+    in_game = joblib.load('src/models-and-scalers/seriea/scalers_seriea_multi_in_game.pkl')
+    pre_game = joblib.load('src/models-and-scalers/seriea/scalers_seriea_multi_pre_game.pkl')
+
+    return in_game, pre_game
+
+
+def calculate_proba(mod_binary_in_game, mod_binary_pre_game, mod_multiclass_in_game, mod_multiclass_pre_game,
+                    sc_in_game, sc_pre_game):
+    drop_columns_in_game = ['Date', 'FTHG', 'FTAG', 'FTR', 'HTR', 'HomeTeam', 'AwayTeam', 'FTREncoded']
+    drop_columns_pre_game = ['Date', 'FTHG', 'FTAG', 'FTR', 'HTR', 'HTREncoded', 'HomeTeam', 'AwayTeam', 'HTHG', 'HTAG',
+                             'HS', 'AS', 'HF', 'AF', 'HC', 'AC', 'HY', 'AY', 'HR', 'AR', 'FTREncoded']
+
+    df_in_game = match_df.drop(columns=drop_columns_in_game)
+    df_pre_game = match_df.drop(columns=drop_columns_pre_game)
+
+    exclude_columns = ['Season', 'MatchDayOfWeek', 'MatchMonth', 'HTREncoded', 'HomeTeamTargetEncoded_0',
+                       'AwayTeamTargetEncoded_0', 'HomeTeamTargetEncoded_2', 'AwayTeamTargetEncoded_2',
+                       'HomeTeamTargetEncoded_1', 'AwayTeamTargetEncoded_1']
+    columns_to_scale_in_game = df_in_game.columns.difference(exclude_columns)
+    columns_to_scale_pre_game = df_pre_game.columns.difference(exclude_columns)
+
+    df_in_game[columns_to_scale_in_game] = sc_in_game.transform(df_in_game[columns_to_scale_in_game])
+    df_pre_game[columns_to_scale_pre_game] = sc_pre_game.transform(df_pre_game[columns_to_scale_pre_game])
+
+    y_proba_multiclass_in_game = mod_multiclass_in_game.predict_proba(df_in_game)
+    y_proba_multiclass_pre_game = mod_multiclass_pre_game.predict_proba(df_pre_game)
+
+    y_proba_binary_in_game = mod_binary_in_game.predict_proba(df_in_game)
+    y_proba_binary_pre_game = mod_binary_pre_game.predict_proba(df_pre_game)
+
+    return y_proba_binary_in_game, y_proba_binary_pre_game, y_proba_multiclass_in_game, y_proba_multiclass_pre_game
+
+
+def get_predictions(league):
+    mod_binary_in_game = None
+    mod_binary_pre_game = None
+    mod_multiclass_in_game = None
+    mod_multiclass_pre_game = None
+
+    sc_in_game = None
+    sc_pre_game = None
+
+    if league == bundesliga:
+        mod_binary_in_game, mod_binary_pre_game, mod_multiclass_in_game, mod_multiclass_pre_game = get_models_bundesliga()
+        sc_in_game, sc_pre_game = get_scalers_bundesliga()
+    elif league == laliga:
+        mod_binary_in_game, mod_binary_pre_game, mod_multiclass_in_game, mod_multiclass_pre_game = get_models_laliga()
+        sc_in_game, sc_pre_game = get_scalers_laliga()
+    elif league == ligue1:
+        mod_binary_in_game, mod_binary_pre_game, mod_multiclass_in_game, mod_multiclass_pre_game = get_models_ligue1()
+        sc_in_game, sc_pre_game = get_scalers_ligue1()
+    elif league == pl:
+        mod_binary_in_game, mod_binary_pre_game, mod_multiclass_in_game, mod_multiclass_pre_game = get_models_pl()
+        sc_in_game, sc_pre_game = get_scalers_pl()
+    elif league == seriea:
+        mod_binary_in_game, mod_binary_pre_game, mod_multiclass_in_game, mod_multiclass_pre_game = get_models_seriea()
+        sc_in_game, sc_pre_game = get_scalers_seriea()
+
+    (y_proba_binary_in_game,
+     y_proba_binary_pre_game,
+     y_proba_multiclass_in_game,
+     y_proba_multiclass_pre_game) = calculate_proba(mod_binary_in_game, mod_binary_pre_game,
+                                                    mod_multiclass_in_game, mod_multiclass_pre_game,
+                                                    sc_in_game, sc_pre_game)
+
+    return y_proba_binary_in_game, y_proba_binary_pre_game, y_proba_multiclass_in_game, y_proba_multiclass_pre_game
+
+
+def odds_to_prob(df, home_col, draw_col, away_col):
+    prob_home = 1 / df[home_col]
+    prob_draw = 1 / df[draw_col]
+    prob_away = 1 / df[away_col]
+
+    total_prob = prob_home + prob_draw + prob_away
+    prob_home /= total_prob
+    prob_draw /= total_prob
+    prob_away /= total_prob
+
+    return prob_home, prob_draw, prob_away
+
+
+def process_bookies_odds():
+    bookies_df = match_df[['FTREncoded']].copy()
+    bookies_df['B365HProb'], bookies_df['B365DProb'], bookies_df['B365AProb'] = odds_to_prob(match_df, 'B365H', 'B365D',
+                                                                                             'B365A')
+    # Convert IW odds to probabilities
+    bookies_df['IWHProb'], bookies_df['IWDProb'], bookies_df['IWAProb'] = odds_to_prob(match_df, 'IWH', 'IWD', 'IWA')
+    # Convert WH odds to probabilities
+    bookies_df['WHHProb'], bookies_df['WHDProb'], bookies_df['WHAProb'] = odds_to_prob(match_df, 'WHH', 'WHD', 'WHA')
+    b365_list = bookies_df[['B365HProb', 'B365DProb', 'B365AProb']].iloc[0].tolist()
+    iw_list = bookies_df[['IWHProb', 'IWDProb', 'IWAProb']].iloc[0].tolist()
+    wh_list = bookies_df[['WHHProb', 'WHDProb', 'WHAProb']].iloc[0].tolist()
+
+    return b365_list, iw_list, wh_list
+
+
+def pred_pie_chart(grid, predictions, title, is_binary=False):
+    home_team = match_df["HomeTeam"].iloc[0]
+    away_team = match_df["AwayTeam"].iloc[0]
+
+    if not is_binary:
+        labels = [f'{home_team} Win', 'Draw', f'{away_team} Win']
+    else:
+        labels = [f'{away_team} Win', f'{home_team} Win/Draw']
+
+    # Convert ndarray to a list for Plotly Express
+    values_list = predictions
+    # Create the pie chart with additional customization
+    fig = px.pie(values=values_list, names=labels, title=title,
+                 hole=0.3, labels={'values': 'Percentage', 'label': 'Event'})
+    grid.plotly_chart(fig)
+
+
+def prediction_graphs():
+    st.markdown("##### Predictions Visualizations")
+    my_grid = grid([1, 0.1, 1], [1, 0.1, 1], [1, 0.1, 1, 0.1, 1], vertical_align="top")
+    (y_proba_binary_in_game,
+     y_proba_binary_pre_game,
+     y_proba_multiclass_in_game,
+     y_proba_multiclass_pre_game) = get_predictions(st.session_state.selected_league)
+
+    b365_list, iw_list, wh_list = process_bookies_odds()
+
+    # Row 1
+    pred_pie_chart(my_grid, y_proba_multiclass_pre_game[0], title="Multiclass pre-game")
+    my_grid.empty()
+    pred_pie_chart(my_grid, y_proba_multiclass_in_game[0], title="Multiclass in-game")
+
+    # Row 2
+    pred_pie_chart(my_grid, y_proba_binary_pre_game[0], title="Binary pre-game", is_binary=True)
+    my_grid.empty()
+    pred_pie_chart(my_grid, y_proba_binary_in_game[0], title="Binary in-game", is_binary=True)
+
+    # Row 3
+    pred_pie_chart(my_grid, b365_list, title="Bet365")
+    my_grid.empty()
+    pred_pie_chart(my_grid, iw_list, title="Interwetten ")
+    my_grid.empty()
+    pred_pie_chart(my_grid, wh_list, title="William Hill")
 
 def match_graphs():
     st.markdown("##### Match Visualizations")
@@ -295,6 +518,7 @@ def match_graphs():
 
     get_win_rate_current_season_match_df(my_grid)
 
+
 def h2h_graphs():
     st.markdown("##### H2H Visualizations")
     my_grid = grid([1, 0.1, 1], [1, 0.1, 1, 0.1, 1], vertical_align="top")
@@ -316,6 +540,7 @@ def h2h_graphs():
     #
     # get_red_cards_match_df(my_grid)
 
+
 def tabs_section():
     with st.container(border=False):
         tabs = ['Match Stats', 'H2H Stats', 'Odds vs Prediction', 'Past H2H Results']
@@ -331,7 +556,7 @@ def tabs_section():
             h2h_graphs()
         with odds_pred_tab:
             st.subheader("Odds vs Prediction", divider='gray')
-
+            prediction_graphs()
         with past_h2h_tab:
             st.subheader("Past H2H Results", divider='gray')
             past_h2h_df = get_filtered_df(league=st.session_state.selected_league, season=None,
