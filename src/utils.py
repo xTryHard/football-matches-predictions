@@ -1,14 +1,25 @@
+import os
+
 import pandas as pd
 import numpy as np
 import streamlit as st
 
 
+
+def load_dataset(filename, encoding = 'utf-8'):
+    data_dir = os.path.join('src', 'data')
+    file_path = os.path.join(data_dir, filename)
+    if not os.path.isfile(file_path):
+        st.error(f"File not found: {file_path}")
+        return None
+    return pd.read_csv(file_path)
+
 def get_dataframes():
-    df_bundesliga = pd.read_csv('src\data\dataset-bundesliga-combined.csv', encoding='utf-8')
-    df_laliga = pd.read_csv('src\data\dataset-laliga-combined.csv', encoding='utf-8')
-    df_pl = pd.read_csv('src\data\dataset-pl-combined.csv', encoding='windows-1252')
-    df_seriea = pd.read_csv('src\data\dataset-seriea-combined.csv', encoding='utf-8')
-    df_ligue1 = pd.read_csv('src\data\dataset-ligue1-combined.csv', encoding='utf-8')
+    df_bundesliga = load_dataset(filename='dataset-bundesliga-combined.csv')
+    df_laliga = load_dataset(filename='dataset-laliga-combined.csv')
+    df_pl = load_dataset(filename='dataset-pl-combined.csv', encoding='windows-1252')
+    df_seriea = load_dataset(filename='dataset-seriea-combined.csv')
+    df_ligue1 = load_dataset(filename='dataset-ligue1-combined.csv')
 
     return df_bundesliga, df_laliga, df_pl, df_seriea, df_ligue1
 

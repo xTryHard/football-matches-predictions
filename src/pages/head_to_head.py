@@ -1,3 +1,5 @@
+import os
+
 import joblib
 import numpy as np
 import streamlit as st
@@ -273,82 +275,92 @@ def get_h2h_rates_match_df(grid):
     grid.plotly_chart(fig)
 
 
+
+def load_model_scaler(filename, league):
+    data_dir = os.path.join('src', 'models-and-scalers', league)
+    file_path = os.path.join(data_dir, filename)
+    if not os.path.isfile(file_path):
+        st.error(f"File not found: {file_path}")
+        return None
+    return joblib.load(file_path)
+
 def get_models_bundesliga():
-    binary_in_game = joblib.load('src/models-and-scalers/bundesliga/best_model_bundesliga_binary_in_game.pkl')
-    binary_pre_game = joblib.load('src/models-and-scalers/bundesliga/best_model_bundesliga_binary_pre_game.pkl')
-    multiclass_in_game = joblib.load('src/models-and-scalers/bundesliga/best_model_bundesliga_multi_in_game.pkl')
-    multiclass_pre_game = joblib.load('src/models-and-scalers/bundesliga/best_model_bundesliga_multi_pre_game.pkl')
+    binary_in_game = load_model_scaler('best_model_bundesliga_binary_in_game.pkl', 'bundesliga')
+    binary_pre_game = load_model_scaler('best_model_bundesliga_binary_pre_game.pkl', 'bundesliga')
+    multiclass_in_game = load_model_scaler('best_model_bundesliga_multi_in_game.pkl', 'bundesliga')
+    multiclass_pre_game = load_model_scaler('best_model_bundesliga_multi_pre_game.pkl', 'bundesliga')
 
     return binary_in_game, binary_pre_game, multiclass_in_game, multiclass_pre_game
 
 
 def get_models_laliga():
-    binary_in_game = joblib.load('src/models-and-scalers/laliga/best_model_laliga_binary_in_game.pkl')
-    binary_pre_game = joblib.load('src/models-and-scalers/laliga/best_model_laliga_binary_pre_game.pkl')
-    multiclass_in_game = joblib.load('src/models-and-scalers/laliga/best_model_laliga_multi_in_game.pkl')
-    multiclass_pre_game = joblib.load('src/models-and-scalers/laliga/best_model_laliga_multi_pre_game.pkl')
+    binary_in_game = load_model_scaler('best_model_laliga_binary_in_game.pkl', 'laliga')
+    binary_pre_game = load_model_scaler('best_model_laliga_binary_pre_game.pkl', 'laliga')
+    multiclass_in_game = load_model_scaler('best_model_laliga_multi_in_game.pkl', 'laliga')
+    multiclass_pre_game = load_model_scaler('best_model_laliga_multi_pre_game.pkl', 'laliga')
 
     return binary_in_game, binary_pre_game, multiclass_in_game, multiclass_pre_game
 
 
 def get_models_ligue1():
-    binary_in_game = joblib.load('src/models-and-scalers/ligue1/best_model_ligue1_binary_in_game.pkl')
-    binary_pre_game = joblib.load('src/models-and-scalers/ligue1/best_model_ligue1_binary_pre_game.pkl')
-    multiclass_in_game = joblib.load('src/models-and-scalers/ligue1/best_model_ligue1_multi_in_game.pkl')
-    multiclass_pre_game = joblib.load('src/models-and-scalers/ligue1/best_model_ligue1_multi_pre_game.pkl')
+
+    binary_in_game = load_model_scaler('best_model_ligue1_binary_in_game.pkl', 'ligue1')
+    binary_pre_game = load_model_scaler('best_model_ligue1_binary_pre_game.pkl', 'ligue1')
+    multiclass_in_game = load_model_scaler('best_model_ligue1_multi_in_game.pkl', 'ligue1')
+    multiclass_pre_game = load_model_scaler('best_model_ligue1_multi_pre_game.pkl', 'ligue1')
 
     return binary_in_game, binary_pre_game, multiclass_in_game, multiclass_pre_game
 
 
 def get_models_pl():
-    binary_in_game = joblib.load('src/models-and-scalers/pl/best_model_pl_binary_in_game.pkl')
-    binary_pre_game = joblib.load('src/models-and-scalers/pl/best_model_pl_binary_pre_game.pkl')
-    multiclass_in_game = joblib.load('src/models-and-scalers/pl/best_model_pl_multi_in_game.pkl')
-    multiclass_pre_game = joblib.load('src/models-and-scalers/pl/best_model_pl_multi_pre_game.pkl')
+    binary_in_game = load_model_scaler('best_model_pl_binary_in_game.pkl', 'pl')
+    binary_pre_game = load_model_scaler('best_model_pl_binary_pre_game.pkl', 'pl')
+    multiclass_in_game = load_model_scaler('best_model_pl_multi_in_game.pkl', 'pl')
+    multiclass_pre_game = load_model_scaler('best_model_pl_multi_pre_game.pkl', 'pl')
 
     return binary_in_game, binary_pre_game, multiclass_in_game, multiclass_pre_game
 
 
 def get_models_seriea():
-    binary_in_game = joblib.load('src/models-and-scalers/seriea/best_model_seriea_binary_in_game.pkl')
-    binary_pre_game = joblib.load('src/models-and-scalers/seriea/best_model_seriea_binary_pre_game.pkl')
-    multiclass_in_game = joblib.load('src/models-and-scalers/seriea/best_model_seriea_multi_in_game.pkl')
-    multiclass_pre_game = joblib.load('src/models-and-scalers/seriea/best_model_seriea_multi_pre_game.pkl')
+    binary_in_game = load_model_scaler('best_model_seriea_binary_in_game.pkl', 'seriea')
+    binary_pre_game = load_model_scaler('best_model_seriea_binary_pre_game.pkl', 'seriea')
+    multiclass_in_game = load_model_scaler('best_model_seriea_multi_in_game.pkl', 'seriea')
+    multiclass_pre_game = load_model_scaler('best_model_seriea_multi_pre_game.pkl', 'seriea')
 
     return binary_in_game, binary_pre_game, multiclass_in_game, multiclass_pre_game
 
 
 def get_scalers_bundesliga():
-    in_game = joblib.load('src/models-and-scalers/bundesliga/scaler_bundesliga_multi_in_game.pkl')
-    pre_game = joblib.load('src/models-and-scalers/bundesliga/scaler_bundesliga_multi_pre_game.pkl')
+    in_game = load_model_scaler('scaler_bundesliga_multi_in_game.pkl', 'bundesliga')
+    pre_game = load_model_scaler('scaler_bundesliga_multi_pre_game.pkl', 'bundesliga')
 
     return in_game, pre_game
 
 
 def get_scalers_laliga():
-    in_game = joblib.load('src/models-and-scalers/laliga/scaler_laliga_multi_in_game.pkl')
-    pre_game = joblib.load('src/models-and-scalers/laliga/scaler_laliga_multi_pre_game.pkl')
+    in_game = load_model_scaler('scaler_laliga_multi_in_game.pkl', 'laliga')
+    pre_game = load_model_scaler('scaler_laliga_multi_pre_game.pkl', 'laliga')
 
     return in_game, pre_game
 
 
 def get_scalers_ligue1():
-    in_game = joblib.load('src/models-and-scalers/ligue1/scaler_ligue1_multi_in_game.pkl')
-    pre_game = joblib.load('src/models-and-scalers/ligue1/scaler_ligue1_multi_pre_game.pkl')
+    in_game = load_model_scaler('scaler_ligue1_multi_in_game.pkl', 'ligue1')
+    pre_game = load_model_scaler('scaler_ligue1_multi_pre_game.pkl', 'ligue1')
 
     return in_game, pre_game
 
 
 def get_scalers_pl():
-    in_game = joblib.load('src/models-and-scalers/pl/scaler_pl_multi_in_game.pkl')
-    pre_game = joblib.load('src/models-and-scalers/pl/scaler_pl_multi_pre_game.pkl')
+    in_game = load_model_scaler('scaler_pl_multi_in_game.pkl', 'pl')
+    pre_game = load_model_scaler('scaler_pl_multi_pre_game.pkl', 'pl')
 
     return in_game, pre_game
 
 
 def get_scalers_seriea():
-    in_game = joblib.load('src/models-and-scalers/seriea/scalers_seriea_multi_in_game.pkl')
-    pre_game = joblib.load('src/models-and-scalers/seriea/scalers_seriea_multi_pre_game.pkl')
+    in_game = load_model_scaler('scalers_seriea_multi_in_game.pkl', 'seriea')
+    pre_game = load_model_scaler('scalers_seriea_multi_pre_game.pkl', 'seriea')
 
     return in_game, pre_game
 
