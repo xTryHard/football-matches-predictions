@@ -6,7 +6,7 @@ def menu():
         page_title="European Football Predictions",
         page_icon="⚽",
         layout="wide",
-        initial_sidebar_state="expanded",
+        initial_sidebar_state="collapsed",
     )
     st.sidebar.page_link("app.py", label="Matches")
     st.sidebar.page_link("pages/leagues.py", label="Leagues")

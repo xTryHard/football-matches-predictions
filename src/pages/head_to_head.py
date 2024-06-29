@@ -359,8 +359,8 @@ def get_scalers_pl():
 
 
 def get_scalers_seriea():
-    in_game = load_model_scaler('scalers_seriea_multi_in_game.pkl', 'seriea')
-    pre_game = load_model_scaler('scalers_seriea_multi_pre_game.pkl', 'seriea')
+    in_game = load_model_scaler('scaler_seriea_multi_in_game.pkl', 'seriea')
+    pre_game = load_model_scaler('scaler_seriea_multi_pre_game.pkl', 'seriea')
 
     return in_game, pre_game
 
@@ -454,6 +454,12 @@ def process_bookies_odds():
 
     return b365_list, iw_list, wh_list
 
+def find_max_element(pred_list):
+    return np.argmax(pred_list)
+
+
+def format_title(label, title):
+    return f'{title} <br><sup>{label}</sup>'
 
 def pred_pie_chart(grid, predictions, title, is_binary=False):
     home_team = match_df["HomeTeam"].iloc[0]
@@ -464,13 +470,12 @@ def pred_pie_chart(grid, predictions, title, is_binary=False):
     else:
         labels = [f'{away_team} Win', f'{home_team} Win/Draw']
 
-    # Convert ndarray to a list for Plotly Express
-    values_list = predictions
+    formatted_title = format_title(labels[find_max_element(predictions)], title)
+
     # Create the pie chart with additional customization
-    fig = px.pie(values=values_list, names=labels, title=title,
+    fig = px.pie(values=predictions, names=labels, title=formatted_title,
                  hole=0.3, labels={'values': 'Percentage', 'label': 'Event'})
     grid.plotly_chart(fig)
-
 
 def prediction_graphs():
     st.markdown("##### Predictions Visualizations")
@@ -570,7 +575,7 @@ def tabs_section():
             st.subheader("Odds vs Prediction", divider='gray')
             prediction_graphs()
         with past_h2h_tab:
-            st.subheader("Past H2H Results", divider='gray')
+            st.subheader("All H2H Results", divider='gray')
             past_h2h_df = get_filtered_df(league=st.session_state.selected_league, season=None,
                                           home_team=selected_row_data["HomeTeam"],
                                           away_team=selected_row_data["AwayTeam"], h2h=True)
