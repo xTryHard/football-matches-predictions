@@ -209,7 +209,7 @@ def get_elo_match_df(grid):
             'HomeTeam': 'Team', 'HomeElo': 'Elo'
         }),
         match_df[['AwayTeam', 'AwayElo']].rename(columns={
-            'AwayTeam': 'Team', 'AR': 'Elo'
+            'AwayTeam': 'Team', 'AwayElo': 'Elo'
         })
     ], ignore_index=True)
     fig = px.bar(elo_data, x="Team", y="Elo", title='Elo by Team', color='Team')
